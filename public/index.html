@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阿臭弟AI发送器</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="task-tabs-shell">
+      <div id="workspace-tabs" class="task-tabs" role="tablist" aria-label="环境页签"></div>
+      <button id="add-workspace-tab" type="button" class="task-tab-add" title="新建环境">+</button>
+    </header>
+
+    <main class="app-shell">
+      <aside class="left-panel">
+        <div class="brand-block">
+          <h1>阿臭弟AI发送器</h1>
+        </div>
+
+        <section class="panel-section">
+          <h2>浏览器</h2>
+          <select id="browser-type" class="control-input">
+            <option value="edge" selected>Microsoft Edge</option>
+            <option value="chrome">Google Chrome</option>
+            <option value="brave">Brave Browser</option>
+            <option value="opera">Opera</option>
+            <option value="opera-gx">Opera GX</option>
+            <option value="vivaldi">Vivaldi</option>
+            <option value="chromium">Chromium</option>
+            <option value="qqbrowser">QQ 浏览器</option>
+            <option value="360chrome">360 极速浏览器</option>
+            <option value="360se">360 安全浏览器</option>
+            <option value="custom">自定义 Chromium 浏览器路径</option>
+          </select>
+          <p id="browser-hint" class="control-hint">独立资料，不影响原浏览器。</p>
+          <input id="browser-path" class="control-input hidden" placeholder="粘贴 Chromium 内核浏览器 exe 路径" />
+          <p id="browser-path-hint" class="control-hint hidden">仅支持 Chromium 内核。</p>
+          <select id="profile-mode" class="control-input">
+            <option value="isolated" selected>独立资料目录（推荐）</option>
+            <option value="system">原浏览器资料</option>
+          </select>
+          <input id="isolated-profile-name" class="control-input" value="Default" placeholder="独立资料名称，例如 账号1" />
+          <p id="isolated-profile-hint" class="control-hint">独立资料，需单独登录。</p>
+          <input id="profile-directory" class="control-input hidden" value="Default" placeholder="原浏览器 Profile，例如 Default / Profile 1" />
+          <p id="system-profile-hint" class="control-hint hidden">沿用原浏览器资料。</p>
+        </section>
+
+        <section class="panel-section">
+          <h2>目标平台</h2>
+          <select id="target-platform" class="control-input">
+            <option value="chatgpt" selected>ChatGPT</option>
+            <option value="gemini">Gemini</option>
+            <option value="doubao">豆包</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="custom">自定义平台网址</option>
+          </select>
+          <p id="target-hint" class="control-hint">发送到 ChatGPT。</p>
+          <input id="target-url" class="control-input hidden" placeholder="粘贴目标平台聊天页网址" />
+        </section>
+
+        <section class="panel-section">
+          <h2>工作流</h2>
+          <input id="workflow-name" class="control-input" placeholder="工作流名称" />
+          <select id="workflow-select" class="control-input"></select>
+          <div class="button-row">
+            <button id="save-workflow" type="button" class="secondary-button">保存</button>
+            <button id="load-workflow" type="button" class="secondary-button">重载</button>
+            <button id="delete-workflow" type="button" class="secondary-button">删除</button>
+          </div>
+          <button id="refresh-workflows" type="button" class="secondary-button full-button">刷新列表</button>
+        </section>
+
+        <section class="panel-section action-stack">
+          <button id="open-chatgpt" type="button" class="secondary-button">新开目标平台窗口</button>
+          <button id="start-run" type="button" class="primary-button">开始发送</button>
+          <button id="stop-run" type="button" class="danger-button" disabled>暂停</button>
+        </section>
+
+      </aside>
+
+      <aside id="monitor-drawer" class="monitor-drawer is-collapsed">
+          <button id="monitor-toggle" type="button" class="monitor-header" aria-expanded="false">
+            <span>
+              <strong>运行监控</strong>
+              <small id="monitor-summary">未开始 · 0 / 0</small>
+            </span>
+            <span class="monitor-toggle-icon" aria-hidden="true">☰</span>
+          </button>
+          <div class="monitor-content">
+            <section class="status-section">
+              <h2>运行状态</h2>
+              <div class="status-grid">
+                <div>
+                  <span>状态</span>
+                  <strong id="job-status">未开始</strong>
+                </div>
+                <div>
+                  <span>当前</span>
+                  <strong id="current-stage">-</strong>
+                </div>
+                <div>
+                  <span>完成</span>
+                  <strong id="stage-progress">0 / 0</strong>
+                </div>
+              </div>
+              <div class="queue-panel">
+                <div class="section-title-row">
+                  <h3>任务列表</h3>
+                </div>
+                <div id="queue-list" class="queue-list">暂无任务。</div>
+                <button id="add-task-page" type="button" class="secondary-button full-button task-list-add">+ 添加任务</button>
+              </div>
+            </section>
+
+            <section class="log-section">
+              <div class="section-title-row">
+                <h2>日志</h2>
+                <button id="clear-log" type="button" class="text-button">清空</button>
+              </div>
+              <pre id="log-box" class="log-box">等待操作。</pre>
+            </section>
+          </div>
+      </aside>
+
+      <section class="canvas-panel">
+        <header class="canvas-toolbar">
+          <div>
+            <h2>阶段编排</h2>
+            <p>按顺序发送，遇空停止。</p>
+            <span id="task-page-status" class="task-page-status">任务 1 / 1 · 未提交</span>
+          </div>
+          <button id="clear-page" type="button" class="secondary-button">清空页面</button>
+        </header>
+
+        <div class="task-page-shell">
+          <div id="workflow-canvas" class="workflow-canvas">
+          <svg id="node-links" class="workflow-links" aria-hidden="true"></svg>
+          <form id="stage-form" class="stage-grid"></form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <template id="stage-template">
+      <article class="stage-card">
+        <i class="node-port port-in" aria-hidden="true"></i>
+        <i class="node-port port-out" aria-hidden="true"></i>
+        <div class="stage-head">
+          <span class="stage-index"></span>
+          <input class="stage-name" type="text" maxlength="60" placeholder="自定义阶段名称" />
+          <select class="stage-layout-mode" title="选择本阶段显示和发送哪些模块">
+            <option value="full">完整模式</option>
+            <option value="prompt">仅提示词</option>
+            <option value="files">仅图片 / 文件</option>
+            <option value="filesPrompt">图片 + 提示词</option>
+            <option value="replacements">变量替换</option>
+            <option value="custom">自定义显示</option>
+          </select>
+          <div class="stage-module-options hidden">
+            <label><input class="stage-module-toggle" data-module="files" type="checkbox" checked /> 图</label>
+            <label><input class="stage-module-toggle" data-module="source" type="checkbox" checked /> 原</label>
+            <label><input class="stage-module-toggle" data-module="replacements" type="checkbox" checked /> 替</label>
+            <label><input class="stage-module-toggle" data-module="preview" type="checkbox" checked /> 预</label>
+          </div>
+          <button class="stage-remove-button" type="button" title="删除本阶段" aria-label="删除本阶段">×</button>
+          <input class="stage-mode" type="hidden" value="send" />
+        </div>
+        <div class="stage-body">
+          <section class="stage-file-panel prompt-column product-column" data-stage-module="files">
+            <span>产品图</span>
+            <label class="file-zone">
+              <input class="stage-files" type="file" multiple />
+              <span>选择图片 / 文件</span>
+              <small>点击 / 拖入文件夹</small>
+              <div class="file-list">未选择文件</div>
+            </label>
+          </section>
+          <label class="prompt-column prompt-source" data-stage-module="source">
+            <span>原内容</span>
+            <textarea class="stage-template-prompt" placeholder="原提示词模板"></textarea>
+          </label>
+          <section class="prompt-column replacement-column" data-stage-module="replacements">
+            <div class="replacement-column-heads">
+              <div class="prompt-column-head replacement-marker-head">
+                <span>替换的原内容</span>
+              </div>
+              <div class="prompt-column-head replacement-value-head">
+                <span>替换内容</span>
+                <button class="add-replacement-button" type="button">+ 添加</button>
+              </div>
+            </div>
+            <div class="replacement-list"></div>
+          </section>
+          <label class="prompt-column prompt-result" data-stage-module="preview">
+            <span>全新内容（实际发送）</span>
+            <textarea class="stage-prompt" readonly placeholder="自动生成，实际发送"></textarea>
+          </label>
+        </div>
+        <div class="stage-actions">
+          <button class="add-stage-button" type="button">+ 添加下一阶段</button>
+        </div>
+        <div class="stage-resize-handle" title="拖动调整阶段高度，双击恢复默认" aria-label="调整阶段高度" role="separator"></div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+runs/
+logs/
+browser-profiles/
+tmp_uploads/
+workflows/
+archive/
+qa_screenshots/
+tmp_restore_backup_*/
+*.log
+server.out.log
+server.err.log
+*.lnk
+.env
+.DS_Store
+npm-debug.log*

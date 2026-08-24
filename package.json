@@ -1,0 +1,62 @@
+{
+  "name": "auto-sender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local visual prompt queue sender for AI chat web pages.",
+  "main": "desktop-main.js",
+  "scripts": {
+    "start": "node server.js",
+    "desktop": "electron desktop-main.js",
+    "test": "node tests/response-contract.test.js",
+    "dist": "electron-builder --win portable --x64",
+    "dist:portable": "electron-builder --win portable --x64",
+    "dist:installer": "electron-builder --win nsis --x64",
+    "dist:friend": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-friend-package.ps1"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^2.2.0",
+    "playwright": "^1.45.3"
+  },
+  "devDependencies": {
+    "electron": "^43.1.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "local.prompt.auto.sender.workbench",
+    "productName": "阿臭弟AI发送器",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "desktop-main.js",
+      "server.js",
+      "package.json",
+      "public/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "icon": "assets/app-icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "阿臭弟AI发送器-portable-${version}.${ext}"
+    },
+    "nsis": {
+      "artifactName": "阿臭弟AI发送器-Setup-${version}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "阿臭弟AI发送器"
+    }
+  }
+}
